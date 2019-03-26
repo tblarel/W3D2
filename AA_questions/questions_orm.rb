@@ -1,4 +1,5 @@
 require_relative 'base_orm.rb'
+require_relative 'question_follows_orm'
 
 class Question 
   attr_accessor :id, :title, :body, :user_id 
@@ -38,6 +39,10 @@ class Question
     data.map { |datum| Question.new(datum) }
   end
 
+  def self.most_followed(n)
+    QuestionFollows.most_followed_questions(n)
+  end
+
   def initialize(options)
     @id = options["id"]
     @title = options["title"]
@@ -57,4 +62,14 @@ class Question
     QuestionFollows.followers_for_question_id(self.id)
   end
 
+  def likers
+    QuestionLike.likers_for_question_id(self.id)
+  end
+
+  def num_likes
+    QuestionLike.num_likes_for_question_id(self.id).last.last
+  end
+
+
+  
 end

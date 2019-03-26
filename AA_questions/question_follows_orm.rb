@@ -1,7 +1,9 @@
 require_relative 'base_orm.rb'
+require_relative 'users_orm'
+require_relative 'questions_orm'
 
 class QuestionFollows 
-  attr_accessor :id, :title, :body, :user_id 
+  attr_accessor :id, :question_id, :user_id 
   
   def self.all 
     data = QuestionsDatabase.instance.execute ("SELECT * FROM question_follows")
@@ -25,7 +27,7 @@ class QuestionFollows
   def self.followed_questions_for_user_id(search_user_id)
     data = QuestionsDatabase.instance.execute <<-SQL, search_user_id
       SELECT 
-        questions.id, questions.body
+        questions.id, questions.title, questions.body, questions.user_id
       FROM 
         question_follows
       JOIN
@@ -34,6 +36,25 @@ class QuestionFollows
         question_follows.user_id = ?
     SQL
   data.map { |datum| Question.new(datum) }
+  end
+
+  def self.most_followed_questions(n)
+    data = QuestionsDatabase.instance.execute <<-SQL, n
+      SELECT 
+        questions.id, questions.title, questions.body, questions.user_id, COUNT(question_follows.user_id) as Total_Followers
+      FROM 
+        question_follows
+      JOIN
+        questions ON questions.id = question_follows.question_id
+      GROUP BY
+        question_follows.question_id
+      ORDER BY
+        COUNT(question_follows.user_id) desc
+      LIMIT
+        ?
+        
+    SQL
+    data.map { |datum| [ Question.new(datum), datum['Total_Followers'] ] }
   end
 
   def initialize(options)

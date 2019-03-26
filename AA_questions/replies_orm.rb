@@ -1,4 +1,6 @@
 require_relative 'base_orm.rb'
+require_relative 'users_orm.rb'
+require_relative 'questions_orm.rb'
 
 class Reply 
   attr_accessor :id, :question_id, :body, :user_id , :parent_id
