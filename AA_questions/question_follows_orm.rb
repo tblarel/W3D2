@@ -28,16 +28,6 @@ class Question
     data.map { |datum| Question.new(datum) }
   end
 
-  def self.find_by_author_id(search_author_id)
-    data = QuestionsDatabase.instance.execute <<-SQL, search_author_id
-      SELECT * 
-      FROM questions
-      WHERE
-        user_id = ?
-      SQL
-    data.map { |datum| Question.new(datum) }
-  end
-
   def initialize(options)
     @id = options["id"]
     @title = options["title"]
@@ -45,12 +35,6 @@ class Question
     @user_id = options["user_id"]
   end
 
-  def author
-    User.find_by_id(self.user_id)
-  end
-
-  def replies
-    Reply.find_by_question_id(self.id)
-  end
+  
 
 end
